@@ -4,7 +4,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simpler</title>
 
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <style>
+        li[disabled] {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+    </style>
 </head>
 <body>
     <form action="{{ url_for('add') }}" method="post">
@@ -13,45 +18,71 @@
     </form>
 
     <ul>
-        {% for todo in todos %}
-        <li style="display: flex">
-            {% if loop.index0 == edit_index %} 
-            <form action="{{ url_for('save', index=loop.index0) }}" method="post">
-                <input type="checkbox" name="done" {% if todo['done'] %} checked {% endif %}>
-                <input type="hidden" name="done" value="not done">
-
-                <input type="text" name="task" id="" value="{{ todo['task'] }}">
-                <input type="submit" value="Save">
-            </form>
-
-            <form action="{{ url_for('save', index=loop.index0)}}" method="post">
-                
-            </form>
+        {% if edit_index is defined %}
+            {% for todo in todos %}
             
-            <a href="{{ url_for('delete', index=loop.index0) }}">Delete</a>
+                {% if loop.index0 == edit_index %} 
 
-            <a href="{{ url_for('index')}}">Cancel</a>
-            {% else %}
-            <form action="{{ url_for('check', index=loop.index0) }}" method="post">
-                <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
-               
-            </form>
+                <li style="display: flex">
+                    <form action="{{ url_for('save', index=loop.index0) }}" method="post">
+                        <input type="checkbox" name="done" {% if todo['done'] %} checked {% endif %}>
+                        <input type="hidden" name="done" value="not done">
 
-            <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %}>
-                {{ todo['task'] }}                
-            </text>
+                        <input type="text" name="task" id="" value="{{ todo['task'] }}">
+                        <input type="submit" value="Save">
+                    </form>
+
+                    <form action="{{ url_for('save', index=loop.index0)}}" method="post">
+                        
+                    </form>
+                    
+                    <a href="{{ url_for('delete', index=loop.index0) }}">Delete</a>
+
+                    <a href="{{ url_for('index')}}">Cancel</a>
+                </li>
+                {% else %}
+                <li style="display: flex" disabled>
+                    <form action="{{ url_for('check', index=loop.index0) }}" method="post">
+                        <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
+                    
+                    </form>
+
+                    <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %}>
+                        {{ todo['task'] }}                
+                    </text>
 
 
-            <a href="{{ url_for('edit', index=loop.index0) }}">Edit</a>
+                    <a href="{{ url_for('edit', index=loop.index0) }}">Edit</a>
 
-            <a href="{{ url_for('delete', index=loop.index0) }}">Delete</a>
+                    <a href="{{ url_for('delete', index=loop.index0) }}">Delete</a>
 
-            {% endif %}
+                </li>
+                {% endif %}
+            {% endfor %}
+
+        {% else %}
+            {% for todo in todos %}
+            <li style="display: flex">
+                <form action="{{ url_for('check', index=loop.index0) }}" method="post">
+                    <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
+                
+                </form>
+
+                <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %}>
+                    {{ todo['task'] }}                
+                </text>
 
 
+                <a href="{{ url_for('edit', index=loop.index0) }}">Edit</a>
 
-        </li>
-        {% endfor %}
+                <a href="{{ url_for('delete', index=loop.index0) }}">Delete</a>
+
+            </li>
+            
+            {% endfor %}
+        {% endif %}
+        
+        
     </ul>
 
 </body>
