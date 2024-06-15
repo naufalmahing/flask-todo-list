@@ -44,26 +44,3 @@ def delete(index):
 def check(index):
     todos[index]['done'] = not todos[index]['done']
     return redirect(url_for('index'))
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-"""
-Features
-create
-read 
-update 
-delete
-
-check to strikethrough the text
-- gotta check flask documentation
-edit in same page
-
-later after first commit
-use database
-
-additionals
-use owner
-use datetime
-"""
