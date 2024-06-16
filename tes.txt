@@ -1,0 +1,19 @@
+edit function
+call api
+check if edit is true
+generate element
+input
+submit
+redirect to index
+
+close function
+call api
+redirect to index
+
+desain database
+one to many
+group todo jadi beberapa, todo, doing, done
+declare initial value (todo, doing, done)
+
+many to many
+todo, user, helper table
