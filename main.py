@@ -29,6 +29,7 @@ def index():
     # TODO: get taskgroups
     # TODO: link user and task
 
+
     return render_template('index.html', todos=todos, users=users)
 
 @app.route('/add-task', methods=['POST'])
@@ -44,7 +45,9 @@ def add_task():
 @app.route('/edit-task/<int:index>')
 def edit_task(index):
     todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
-    return render_template('index.html', todos=todos, edit_index=index)
+    users = db.session.execute(db.select(User).order_by(User.id)).scalars()
+
+    return render_template('index.html', todos=todos, users=users, edit_index=index)
 
 @app.route('/save-task/<int:index>', methods=['POST'])
 def save_task(index):
@@ -71,17 +74,36 @@ def check_task(index):
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/add-user', methods=['POST'])
-def add_user():
+@app.route('/add-user/<int:index>')
+def add_user(index):
+    todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
+    users = db.session.execute(db.select(User).order_by(User.id)).scalars()
+
+    return render_template('index.html', todos=todos, users=users, adduser_index=index)
+
+@app.route('/save-user/<int:index>', methods=['POST'])
+def save_user(index):
     if request.method == 'POST':
         name = request.form['name']
-        user = User(
-            name = name
-        )
-        db.session.add(user)
+
+        # get task
+        task = db.session.get(Task, index+1)
+
+        # find user if there is
+        try:
+            user = db.session.execute(db.select(User).filter_by(name=name)).scalar_one()
+        except:
+            user = User(
+                name = name
+            )
+        print(user)
+        
+        # add user to task
+        task.users.add(user)
         db.session.commit()
     return redirect(url_for('index'))
 
+# TODO: create element to get input
 @app.route('/delete-user/<int:index>')
 def delete_user(index):
     db.session.delete(db.session.get(User, index+1))

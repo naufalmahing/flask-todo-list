@@ -1,6 +1,6 @@
 from __future__ import annotations 
 from flask_sqlalchemy import SQLAlchemy
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from sqlalchemy.orm import  (
     DeclarativeBase, 
@@ -42,7 +42,7 @@ class Task(Base):
     task: Mapped[str] = mapped_column(String(100), nullable=False)
     done: Mapped[bool] = mapped_column(default=False)
 
-    users: Mapped[List[User]] = relationship(
+    users: Mapped[Set[User]] = relationship(
         secondary=user_task_m2m, back_populates='tasks'
     )
 
