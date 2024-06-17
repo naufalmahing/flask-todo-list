@@ -17,6 +17,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+# TODO: update routes to not include index parameter
 @app.route('/')
 def index():
     """
@@ -28,7 +29,7 @@ def index():
     todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
     # TODO: get taskgroups
     # TODO: link user and task
-
+    print(users)
 
     return render_template('index.html', todos=todos, users=users)
 
@@ -49,31 +50,32 @@ def edit_task(index):
 
     return render_template('index.html', todos=todos, users=users, edit_index=index)
 
-@app.route('/save-task/<int:index>', methods=['POST'])
-def save_task(index):
+@app.route('/save-task', methods=['POST'])
+def save_task():
     text = request.form['task']
     done = request.form['done']
     
-    task = db.session.get(Task, index+1)
+    task = db.session.get(Task, request.form['id'])
     task.task = text
     task.done = True if done=='on' else False
 
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/delete-task/<int:index>')
-def delete_task(index):
-    db.session.delete(db.get_or_404(Task, index+1))
+@app.route('/delete-task', methods=['POST'])
+def delete_task():
+    db.session.delete(db.get_or_404(Task, request.form['id']))
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/check-task/<int:index>', methods=['POST'])
-def check_task(index):
-    task = db.session.get(Task, index+1)
+@app.route('/check-task', methods=['POST'])
+def check_task():
+    task = db.session.get(Task, request.form['id'])
     task.done = not task.done
     db.session.commit()
     return redirect(url_for('index'))
 
+"""function to show input form for adding user"""
 @app.route('/add-user/<int:index>')
 def add_user(index):
     todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
@@ -81,13 +83,13 @@ def add_user(index):
 
     return render_template('index.html', todos=todos, users=users, adduser_index=index)
 
-@app.route('/save-user/<int:index>', methods=['POST'])
-def save_user(index):
+@app.route('/save-user', methods=['POST'])
+def save_user():
     if request.method == 'POST':
         name = request.form['name']
 
         # get task
-        task = db.session.get(Task, index+1)
+        task = db.session.get(Task, request.form['id'])
 
         # find user if there is
         try:
@@ -97,16 +99,15 @@ def save_user(index):
                 name = name
             )
         print(user)
-        
+
         # add user to task
         task.users.add(user)
         db.session.commit()
     return redirect(url_for('index'))
 
-# TODO: create element to get input
-@app.route('/delete-user/<int:index>')
-def delete_user(index):
-    db.session.delete(db.session.get(User, index+1))
+@app.route('/delete-user', methods=['POST'])
+def delete_user():
+    db.session.delete(db.session.get(User, request.form['id']))
     db.session.commit()
     return redirect(url_for('index'))
 

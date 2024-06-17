@@ -30,47 +30,65 @@
                 <li style="display: flex">
 
                     {% if edit_index is defined %}
-                    <form action="{{ url_for('save_task', index=loop.index0) }}" method="post">
+                    <form action="{{ url_for('save_task') }}" method="post">
                         <input type="checkbox" name="done" {% if todo['done'] %} checked {% endif %}>
                         <input type="hidden" name="done" value="not done">
-                        
+                        <input type="hidden" name="id" value="{{ todo.id }}">
                         <input type="text" name="task" id="" value="{{ todo['task'] }}">
                         <input type="submit" value="Save">
                     </form>
                     
-                    <a href="{{ url_for('delete_task', index=loop.index0) }}">Delete</a>
+                    <a href="{{ url_for('index') }}">Cancel</a>
 
-                    <a href="{{ url_for('index')}}">Cancel</a>
+                    <form action="{{ url_for('delete_task') }}" method="post">
+                        <input type="submit" value="Delete">
+                        <input type="hidden" name="id" value="{{ todo.id }}">
+                    </form>
                     
-                        {% for user in todo.users %}
-                        {{ user.name }}
-                        {% endfor %}
+                    assignee:
+                    {% for user in todo.users|sort(attribute="name") %}
+                    {{ user.name }}
+                    {% endfor %}
 
-                    <a href="{{ url_for('add_user', index=loop.index0) }}">Add user</a>
+                    <form action="{{ url_for('add_user', index=loop.index0) }}" method="get">
+                        <input type="submit" value="Add user">
+                        <input type="hidden" name="id" value="{{ todo.id }}">
+                    </form>
                     
                     {% endif %}
 
                     {% if adduser_index is defined %}
-                    <form action="{{ url_for('check_task', index=loop.index0) }}" method="post">
+                    <form action="{{ url_for('check_task') }}" method="post">
                         <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
                         <input type="hidden" name="done" value="not done">
-                    
+                        <input type="hidden" name="id" value="{{ todo.id }}">
+
                     </form>
 
                     <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %}>
                         {{ todo['task'] }}                
                     </text>
-                    <a href="{{ url_for('edit_task', index=loop.index0) }}">Edit</a>
 
-                    <a href="{{ url_for('delete_task', index=loop.index0) }}">Delete</a>
+                    <form action="{{ url_for('edit_task', index=loop.index0) }}" method="get">
+                        <input type="submit" value="Edit">
+                        <input type="hidden" name="id" value="{{ todo.id }}">
+                    </form>
+    
+                    <form action="{{ url_for('delete_task') }}" method="post">
+                        <input type="submit" value="Delete">
+                        <input type="hidden" name="id" value="{{ todo.id }}">
+                    </form>
 
-                    {% for user in todo.users %}
+                    assignee:
+                    {% for user in todo.users|sort(attribute="name") %}
                     {{ user.name }}
                     {% endfor %}
-
-                    <form action="{{ url_for('save_user', index=loop.index0) }}" method="post">
+                    
+                    <!-- add user inputs -->
+                    <form action="{{ url_for('save_user') }}" method="post">
                         <input type="text" name="name" id="">
                         <input type="submit" value="v">
+                        <input type="hidden" name="id" value="{{ todo.id }}">
                         
                     </form>
                     <a href="{{ url_for('index') }}">x</a>
@@ -79,7 +97,7 @@
 
                 {% else %}
                 <li style="display: flex" disabled>
-                    <form action="{{ url_for('check_task', index=loop.index0) }}" method="post">
+                    <form action="{{ url_for('check_task') }}" method="post">
                         <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
                         <input type="hidden" name="done" value="not done">
                     
@@ -89,16 +107,24 @@
                         {{ todo['task'] }}                
                     </text>
 
-
-                    <a href="{{ url_for('edit_task', index=loop.index0) }}">Edit</a>
-
-                    <a href="{{ url_for('delete_task', index=loop.index0) }}">Delete</a>
-                    
-                    {% for user in todo.users %}
+                    <form action="{{ url_for('edit_task', index=loop.index0) }}" method="get">
+                        <input type="submit" value="Edit">
+                        <input type="hidden" name="id" value="{{ todo.id }}">
+                    </form>
+    
+                    <form action="{{ url_for('delete_task') }}" method="post">
+                        <input type="submit" value="Delete">
+                        <input type="hidden" name="id" value="{{ todo.id }}">
+                    </form>
+                    assignee:
+                    {% for user in todo.users|sort(attribute="name") %}
                     {{ user.name }}
                     {% endfor %}
-
-                    <a href="{{ url_for('add_user', index=loop.index0) }}">Add user</a>
+    
+                    <form action="{{ url_for('add_user', index=loop.index0) }}" method="get">
+                        <input type="submit" value="Add user">
+                        <input type="hidden" name="id" value="{{ todo.id }}">
+                    </form>
 
                 </li>
                 {% endif %}
@@ -107,11 +133,10 @@
         {% else %}
             {% for todo in todos %}
             <li style="display: flex">
-                <form action="{{ url_for('check_task', index=loop.index0) }}" method="post">
+                <form action="{{ url_for('check_task') }}" method="post">
                     <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
                     <input type="hidden" name="done" value="not done">
-                    <!-- TODO: update template to take input from hidden elements instead -->
-                    <!-- <input type="hidden" name="id" value="{{ todo.id }}"> -->
+                    <input type="hidden" name="id" value="{{ todo.id }}">
                     
                 </form>
 
@@ -119,16 +144,24 @@
                     {{ todo['task'] }}                
                 </text>
 
+                <form action="{{ url_for('edit_task', index=loop.index0) }}" method="get">
+                    <input type="submit" value="Edit">                    
+                    <input type="hidden" name="id" value="{{ todo.id }}">
+                </form>
 
-                <a href="{{ url_for('edit_task', index=loop.index0) }}">Edit</a>
-
-                <a href="{{ url_for('delete_task', index=loop.index0) }}">Delete</a>
-                
-                {% for user in todo.users %}
+                <form action="{{ url_for('delete_task') }}" method="post">
+                    <input type="submit" value="Delete">
+                    <input type="hidden" name="id" value="{{ todo.id }}">
+                </form>
+                assignee:
+                {% for user in todo.users|sort(attribute="name") %}
                 {{ user.name }}
                 {% endfor %}
 
-                <a href="{{ url_for('add_user', index=loop.index0) }}">Add user</a>
+                <form action="{{ url_for('add_user', index=loop.index0) }}" method="get">
+                    <input type="submit" value="Add user">
+                    <input type="hidden" name="id" value="{{ todo.id }}">
+                </form>
 
             </li>
             
@@ -140,10 +173,13 @@
     <h3>Users</h3>
     <ul>
        {% for user in users %} 
-        <li class="display:flex">
+        <li style="display: flex">
             {{ user.name }}
         
-            <a href="{{ url_for('delete_user', index=loop.index0) }}">Delete</a>
+             <form action="{{ url_for('delete_user') }}" method="post">
+                <input type="submit" value="Delete">
+                <input type="hidden" name="id" value="{{ user.id }}">
+             </form>
         </li>
        {% endfor %}
     </ul>
