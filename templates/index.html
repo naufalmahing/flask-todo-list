@@ -20,7 +20,7 @@
     {{ taskgroup.name }}
     
     <form action="{{ url_for('add_task') }}" method="post">
-        <input type="text" name="task" id="">
+        <input type="text" name="task" id="" required>
         <input type="submit" value="Add">
         <input type="hidden" name="taskgroup_id" value="{{ taskgroup.id }}">
     </form>
@@ -40,7 +40,7 @@
                         <input type="checkbox" name="done" {% if todo['done'] %} checked {% endif %}>
                         <input type="hidden" name="done" value="not done">
                         <input type="hidden" name="id" value="{{ todo.id }}">
-                        <input type="text" name="task" id="" value="{{ todo['task'] }}">
+                        <input type="text" name="task" id="" value="{{ todo['task'] }}" required>
                         <input type="submit" value="Save">
                     </form>
     
@@ -129,7 +129,7 @@
                     
                     <!-- add user inputs -->
                     <form action="{{ url_for('save_user') }}" method="post">
-                        <input type="text" name="name" id="">
+                        <input type="text" name="name" id="" required>
                         <input type="submit" value="v">
                         <input type="hidden" name="id" value="{{ todo.id }}">
                         

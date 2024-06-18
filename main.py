@@ -6,12 +6,16 @@ from models import (
     TaskGroup, 
     user_task_m2m,
 )
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
 # TODO: update database to postgresql
 # initialize sqlalchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db.init_app(app)
 
 with app.app_context():
@@ -25,10 +29,9 @@ def index():
     get taskgroups
     """
     users = db.session.execute(db.select(User).order_by(User.id)).scalars()
-    todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
     taskgroups = db.session.execute(db.select(TaskGroup).order_by(TaskGroup.id)).scalars()
 
-    return render_template('index.html', todos=todos, users=users, taskgroups=taskgroups)
+    return render_template('index.html', users=users, taskgroups=taskgroups)
 
 @app.route('/add-task', methods=['POST'])
 def add_task():
@@ -56,11 +59,10 @@ def add_task():
 
 @app.route('/edit-task/<int:index0>/<int:index>')
 def edit_task(index0, index):
-    todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
     users = db.session.execute(db.select(User).order_by(User.id)).scalars()
     taskgroups = db.session.execute(db.select(TaskGroup).order_by(TaskGroup.id)).scalars()
 
-    return render_template('index.html', todos=todos, users=users, taskgroups=taskgroups, edit_index=(index0, index))
+    return render_template('index.html', users=users, taskgroups=taskgroups, edit_index=(index0, index))
 
 @app.route('/save-task', methods=['POST'])
 def save_task():
@@ -90,11 +92,10 @@ def check_task():
 """function to show input form for adding user"""
 @app.route('/add-user/<int:index0>/<int:index>')
 def add_user(index0, index):
-    todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
     users = db.session.execute(db.select(User).order_by(User.id)).scalars()
     taskgroups = db.session.execute(db.select(TaskGroup).order_by(TaskGroup.id)).scalars()
 
-    return render_template('index.html', todos=todos, users=users, taskgroups=taskgroups, adduser_index=(index0, index))
+    return render_template('index.html', users=users, taskgroups=taskgroups, adduser_index=(index0, index))
 
 @app.route('/save-user', methods=['POST'])
 def save_user():
