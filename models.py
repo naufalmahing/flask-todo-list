@@ -46,12 +46,12 @@ class Task(Base):
         secondary=user_task_m2m, back_populates='tasks'
     )
 
-    # taskgroup_id: Mapped[int] = mapped_column(ForeignKey('taskgroup_table.id'))
-    # taskgroups: Mapped['TaskGroup'] = relationship(back_populates='tasks')
+    taskgroup_id: Mapped[int] = mapped_column(ForeignKey('taskgroup_table.id'))
+    taskgroups: Mapped['TaskGroup'] = relationship(back_populates='tasks')
 
 class TaskGroup(Base):
     __tablename__ = 'taskgroup_table'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
 
-    # tasks: Mapped[List['Task']] = relationship(back_populates='taskgroups')
+    tasks: Mapped[Optional[List['Task']]] = relationship(back_populates='taskgroups')

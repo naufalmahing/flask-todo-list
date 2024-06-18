@@ -11,13 +11,12 @@ app = Flask(__name__)
 
 # TODO: update database to postgresql
 # initialize sqlalchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project1.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
 
-# TODO: update routes to not include index parameter
 @app.route('/')
 def index():
     """
@@ -27,11 +26,9 @@ def index():
     """
     users = db.session.execute(db.select(User).order_by(User.id)).scalars()
     todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
-    # TODO: get taskgroups
-    # TODO: link user and task
-    print(users)
+    taskgroups = db.session.execute(db.select(TaskGroup).order_by(TaskGroup.id)).scalars()
 
-    return render_template('index.html', todos=todos, users=users)
+    return render_template('index.html', todos=todos, users=users, taskgroups=taskgroups)
 
 @app.route('/add-task', methods=['POST'])
 def add_task():
@@ -39,16 +36,31 @@ def add_task():
     task = Task(
         task=text
     )
-    db.session.add(task)
+    
+    """
+    get the taskgroup input
+    add task to taskgroup
+    display
+
+    input: taskgroup index
+    output: none
+
+    index = 1
+    output = none
+    """
+    index = request.form['taskgroup_id']
+    taskgroup = db.session.get(TaskGroup, index)
+    taskgroup.tasks.append(task)
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/edit-task/<int:index>')
-def edit_task(index):
+@app.route('/edit-task/<int:index0>/<int:index>')
+def edit_task(index0, index):
     todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
     users = db.session.execute(db.select(User).order_by(User.id)).scalars()
+    taskgroups = db.session.execute(db.select(TaskGroup).order_by(TaskGroup.id)).scalars()
 
-    return render_template('index.html', todos=todos, users=users, edit_index=index)
+    return render_template('index.html', todos=todos, users=users, taskgroups=taskgroups, edit_index=(index0, index))
 
 @app.route('/save-task', methods=['POST'])
 def save_task():
@@ -76,12 +88,13 @@ def check_task():
     return redirect(url_for('index'))
 
 """function to show input form for adding user"""
-@app.route('/add-user/<int:index>')
-def add_user(index):
+@app.route('/add-user/<int:index0>/<int:index>')
+def add_user(index0, index):
     todos = db.session.execute(db.select(Task).order_by(Task.id)).scalars()
     users = db.session.execute(db.select(User).order_by(User.id)).scalars()
+    taskgroups = db.session.execute(db.select(TaskGroup).order_by(TaskGroup.id)).scalars()
 
-    return render_template('index.html', todos=todos, users=users, adduser_index=index)
+    return render_template('index.html', todos=todos, users=users, taskgroups=taskgroups, adduser_index=(index0, index))
 
 @app.route('/save-user', methods=['POST'])
 def save_user():
