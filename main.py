@@ -13,7 +13,6 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# TODO: update database to postgresql
 # initialize sqlalchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db.init_app(app)
@@ -161,7 +160,6 @@ def link_user_task():
         pass
         return {'code': 200}
     pass
-
     
 if __name__ == '__main__':
     app.run(debug=True)

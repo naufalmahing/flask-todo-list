@@ -29,8 +29,7 @@
 
     <ul>
         {% if edit_index is defined or adduser_index is defined %}
-            {% for todo in taskgroup.tasks %}
-                <!-- TODO: update adduser function -->
+            {% for todo in taskgroup.tasks|sort(attribute="task") %}
                 <li style="display: flex">
 
                 {% if edit_index is defined %}
@@ -58,7 +57,6 @@
     
                     <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
                         <input type="submit" value="Add user">
-                        <input type="hidden" name="id" value="{{ todo.id }}">
                     </form>
 
                     {% else %}
@@ -76,7 +74,6 @@
 
                         <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
                             <input type="submit" value="Edit">
-                            <input type="hidden" name="id" value="{{ todo.id }}">
                         </form>
         
                         <form action="{{ url_for('delete_task') }}" method="post">
@@ -90,7 +87,6 @@
         
                         <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
                             <input type="submit" value="Add user">
-                            <input type="hidden" name="id" value="{{ todo.id }}">
                         </form>
 
                     </li>
@@ -114,7 +110,6 @@
     
                     <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
                         <input type="submit" value="Edit">
-                        <input type="hidden" name="id" value="{{ todo.id }}">
                     </form>
     
                     <form action="{{ url_for('delete_task') }}" method="post">
@@ -151,7 +146,6 @@
 
                         <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
                             <input type="submit" value="Edit">
-                            <input type="hidden" name="id" value="{{ todo.id }}">
                         </form>
         
                         <form action="{{ url_for('delete_task') }}" method="post">
@@ -165,7 +159,6 @@
         
                         <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
                             <input type="submit" value="Add user">
-                            <input type="hidden" name="id" value="{{ todo.id }}">
                         </form>
 
                     </li>
@@ -178,7 +171,7 @@
 
         {% else %}
 
-            {% for todo in taskgroup.tasks %}
+            {% for todo in taskgroup.tasks|sort(attribute="task") %}
             <li style="display: flex">
                 <form action="{{ url_for('check_task') }}" method="post">
                     <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
@@ -194,7 +187,6 @@
                 <text></text>
                 <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
                     <input type="submit" value="Edit">                    
-                    <input type="hidden" name="id" value="{{ todo.id }}">
                 </form>
 
                 <form action="{{ url_for('delete_task') }}" method="post">
@@ -208,7 +200,6 @@
 
                 <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
                     <input type="submit" value="Add user">
-                    <input type="hidden" name="id" value="{{ todo.id }}">
                 </form>
 
             </li>
