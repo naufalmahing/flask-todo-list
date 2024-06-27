@@ -4,225 +4,399 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simpler</title>
 
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         li[disabled] {
             pointer-events: none;
             opacity: 0.5;
         }
+        li[disabled] {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        form {
+            margin:0;
+        }
+
+        textarea {
+            overflow: hidden;
+            overflow-wrap: break-word;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
-    <h1>
-        <a href="{{ url_for('index') }}">Simpler</a>
-    </h1>
+    <div class="navbar px-2 py-4 w-full h-3rem shadow-md ">
+        <h1>
+            <a href="{{ url_for('index') }}" class="text-5xl font-semibold hover:font-bold ">Simpler</a>
+        </h1>
     
-    {% for taskgroup in taskgroups %}
-    {{ taskgroup.name }}
+    </div>
     
-    <form action="{{ url_for('add_task') }}" method="post">
-        <input type="text" name="task" id="" required>
-        <input type="submit" value="Add">
-        <input type="hidden" name="taskgroup_id" value="{{ taskgroup.id }}">
-    </form>
-
-    {% set index0 = loop.index0 %}
-
-    <ul>
-        {% if edit_index is defined or adduser_index is defined %}
-            {% for todo in taskgroup.tasks|sort(attribute="task") %}
-                <li style="display: flex">
-
-                {% if edit_index is defined %}
-
-                    {% if edit_index[0] == index0 and loop.index0 == edit_index[1] %}
-                    <form action="{{ url_for('save_task') }}" method="post">
-                        <input type="checkbox" name="done" {% if todo['done'] %} checked {% endif %}>
-                        <input type="hidden" name="done" value="not done">
-                        <input type="hidden" name="id" value="{{ todo.id }}">
-                        <input type="text" name="task" id="" value="{{ todo['task'] }}" required>
-                        <input type="submit" value="Save">
-                    </form>
+    <div class="mx-4 mt-2">
+        {% for taskgroup in taskgroups %}
+        <h2 class="text-2xl mb-2">{{ taskgroup.name }}</h2>
+        
+        <form action="{{ url_for('add_task') }}" method="post" class="h-min flex space-x-1">
+            <textarea name="task" rows="1" wrap="soft" class="border border-slate-300 rounded resize-none w-[11rem]   
+            focus:outline-none focus:border-slate-500 px-2 py-1" required></textarea>
+            <input type="submit" value="Add" class="px-4 py-1 bg-slate-200 rounded-md hover:bg-slate-400 h-[2rem]">
+            <input type="hidden" name="taskgroup_id" value="{{ taskgroup.id }}">
     
-                    <a href="{{ url_for('index') }}">Cancel</a>
+            <div style="cursor:pointer" class="clear-button px-4 py-1 bg-red-200 rounded-md hover:bg-red-400 h-[2rem]" href="#">Clear</div>
+        </form>
     
-                    <form action="{{ url_for('delete_task') }}" method="post">
-                        <input type="submit" value="Delete">
-                        <input type="hidden" name="id" value="{{ todo.id }}">
-                    </form>
+        {% set index0 = loop.index0 %}
+    
+        <ul class="space-y-2 my-2 ">
+            {% if edit_index is defined or adduser_index is defined %}
+                {% for todo in taskgroup.tasks|sort(attribute="task") %}
+    
+                    {% if edit_index is defined %}
+                        {% if edit_index[0] == index0 and loop.index0 == edit_index[1] %}
+                        <li class="border border-slate-300 shadow-lg px-3 py-2 drop-shadow-lg rounded-lg ">
+    
+                        <div class="input flex items-center space-x-1">
+                            <form action="{{ url_for('save_task') }}" method="post">
+                                <input type="checkbox" name="done" {% if todo['done'] %} checked {% endif %}>
+                                <input type="hidden" name="done" value="not done">
+
+                                <input type="hidden" name="id" value="{{ todo.id }}">
+
+                                <input type="text" name="task" id="" value="{{ todo['task'] }}" class="border border-slate-300 rounded resize-none w-[11rem]   
+                                focus:outline-none focus:border-slate-500 px-2 py-1"
+                                required>
+
+                                <input type="submit" value="Save" class="px-4 py-1 bg-blue-200 rounded-md hover:bg-blue-400 h-[2rem]">
+                            </form>
+
+                        </div>
+        
+                        <div class="buttons flex h-max space-x-1">
+                            
+                            <a href="{{ url_for('index') }}" class="hover:underline ">Cancel</a>
+            
+                            <form action="{{ url_for('delete_task') }}" method="post">
+                                <input type="submit" value="Delete" class="hover:underline text-red-500 ">
+                                <input type="hidden" name="id" value="{{ todo.id }}">
+                            </form>
+        
+                        </div>
+    
+                        
+                        
+                        assignee:
+                        {% for user in todo.users|sort(attribute="name") %}
+                        <text class="text-sm">
+                            {{ user.name }}
+                        </text>
+                        {% endfor %}
+        
+                        <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
+                            <input type="submit" value="Add user" class="hover:underline text-xs ">
+                        </form>
+                        </li> 
+    
+                        {% else %}
+    
+                        <!-- disabled elements -->
+                        <li class="border border-slate-300 shadow-lg px-3 py-2 drop-shadow-lg rounded-lg " disabled>
+    
+                            <div class="input flex items-center space-x-1 ">
+                                <form action="{{ url_for('check_task') }}" method="post">
+                                    <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
+                                    <input type="hidden" name="done" value="not done">
+                                
+                                </form>
+        
+                                <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %} class="h-[2rem] px-2 py-1">
+                                    {{ todo['task'] }}                
+                                </text>
+    
+                            </div>
+    
+                            <div class="buttons flex h-max space-x-1">
+                                <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
+                                    <input type="submit" value="Edit" class="hover:underline text-blue-500">                    
+                                </form>
                     
+                                <form action="{{ url_for('delete_task') }}" method="post">
+                                    <input type="submit" value="Delete" class="hover:underline text-red-500 ">
+                                    <input type="hidden" name="id" value="{{ todo.id }}">
+                                </form>
+            
+                            </div>
+    
+                            assignee:
+                            {% for user in todo.users|sort(attribute="name") %}
+                            <text class="text-sm">
+                                {{ user.name }}
+                            </text>
+                            {% endfor %}
+            
+                            <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
+                                <input type="submit" value="Add user" class="hover:underline text-xs ">
+                            </form>
+    
+                        </li>
+    
+                        {% endif %}
+                    
+                    {% endif %}
+    
+                    {% if adduser_index is defined %}
+                        {% if adduser_index[0] == index0 and adduser_index[1] == loop.index0 %}
+                        <li class="border border-slate-300 shadow-lg px-3 py-2 drop-shadow-lg rounded-lg ">
+
+                            <div class="input flex items-center space-x-1 ">
+                                <form action="{{ url_for('check_task') }}" method="post">
+                                    <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
+                                    <input type="hidden" name="done" value="not done">
+                                    <input type="hidden" name="id" value="{{ todo.id }}">
+                
+                                </form>
+                
+                                <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %} class="h-[2rem] px-2 py-1">
+                                    {{ todo['task'] }}                
+                                </text>    
+    
+                            </div>
+    
+                            <div class="buttons flex h-max space-x-1">
+                                <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
+                                    <input type="submit" value="Edit" class="hover:underline text-blue-500">
+                                </form>
+                
+                                <form action="{{ url_for('delete_task') }}" method="post">
+                                    <input type="submit" value="Delete" class="hover:underline text-red-500 ">
+                                    <input type="hidden" name="id" value="{{ todo.id }}">
+                                </form>
+    
+                            </div>
+            
+                            <text class="text-sm">assignee:</text>
+                            
+                            {% for user in todo.users|sort(attribute="name") %}
+                            <text class="text-sm">
+                                {{ user.name }}
+                            </text>
+                            {% endfor %}
+                            
+                            <!-- Add user inputs -->
+                            <form action="{{ url_for('save_user') }}" method="post">
+                                <input type="text" name="name" id="" required class="border border-slate-300 rounded resize-none w-[11rem] h-min text-sm
+                                focus:outline-none focus:border-slate-500 px-2 py-1">
+                                <input type="submit" value="Add" class="hover:underline text-blue-500 ">
+                                <input type="hidden" name="id" value="{{ todo.id }}" >
+                                <a href="{{ url_for('index') }}" class="hover:underline text-red-500">Cancel</a>
+                                
+                            </form>
+                        </li>
+    
+                        {% else %}
+                        <!-- disabled elements -->
+                        <li class="border border-slate-300 shadow-lg px-3 py-2 drop-shadow-lg rounded-lg " disabled>
+
+                            <div class="input flex items-center space-x-1">
+                                <form action="{{ url_for('check_task') }}" method="post">
+                                    <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
+                                    <input type="hidden" name="done" value="not done">
+                                
+                                </form>
+        
+                                <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %} class="h-[2rem] px-2 py-1">
+                                    {{ todo['task'] }}                
+                                </text>
+
+                            </div>
+    
+                            <div class="buttons flex h-max space-x-1">
+                                <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get" class="hover:underline text-blue-500">
+                                    <input type="submit" value="Edit">
+                                </form>
+                
+                                <form action="{{ url_for('delete_task') }}" method="post">
+                                    <input type="submit" value="Delete" class="hover:underline text-red-500 ">
+                                    <input type="hidden" name="id" value="{{ todo.id }}">
+                                </form>
+
+                            </div>
+                            assignee:
+                            {% for user in todo.users|sort(attribute="name") %}
+                            <text class="text-sm">
+                                {{ user.name }}
+                            </text>
+                            {% endfor %}
+            
+                            <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
+                                <input type="submit" value="Add user" class="hover:underline text-xs ">
+                            </form>
+    
+                        </li>
+    
+                        {% endif %}
+                    {% endif %} 
+                    </li>
+    
+                {% endfor %}
+    
+            {% else %}
+    
+                {% for todo in taskgroup.tasks|sort(attribute="task") %}
+                <li class="border border-slate-300 shadow-lg px-3 py-2
+                drop-shadow-lg rounded-lg ">
+                    
+                    <div class="input flex items-center space-x-1">
+    
+                        <form action="{{ url_for('check_task') }}" method="post">
+                            <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
+                            <input type="hidden" name="done" value="not done">
+                            <input type="hidden" name="id" value="{{ todo.id }}">
+                            
+                        </form>
+        
+                        <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %} class="h-[2rem] px-2 py-1" class="h-[2rem] px-2 py-1">
+                            {{ todo['task'] }}                
+                        </text>
+                    </div>
+                     
+                    <div class="buttons flex h-max space-x-1">
+                        <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
+                            <input type="submit" value="Edit" class="hover:underline text-blue-500">                    
+                        </form>
+            
+                        <form action="{{ url_for('delete_task') }}" method="post">
+                            <input type="submit" value="Delete" class="hover:underline text-red-500 ">
+                            <input type="hidden" name="id" value="{{ todo.id }}">
+                        </form>
+    
+                    </div>
+    
                     assignee:
                     {% for user in todo.users|sort(attribute="name") %}
-                    {{ user.name }}
+                    <text class="text-sm">
+                        {{ user.name }}
+                    </text>
+                    
                     {% endfor %}
     
                     <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
-                        <input type="submit" value="Add user">
-                    </form>
-
-                    {% else %}
-                    <!-- disabled elements -->
-                    <li style="display: flex" disabled>
-                        <form action="{{ url_for('check_task') }}" method="post">
-                            <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
-                            <input type="hidden" name="done" value="not done">
-                        
-                        </form>
-
-                        <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %}>
-                            {{ todo['task'] }}                
-                        </text>
-
-                        <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
-                            <input type="submit" value="Edit">
-                        </form>
-        
-                        <form action="{{ url_for('delete_task') }}" method="post">
-                            <input type="submit" value="Delete">
-                            <input type="hidden" name="id" value="{{ todo.id }}">
-                        </form>
-                        assignee:
-                        {% for user in todo.users|sort(attribute="name") %}
-                        {{ user.name }}
-                        {% endfor %}
-        
-                        <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
-                            <input type="submit" value="Add user">
-                        </form>
-
-                    </li>
-
-                    {% endif %}
-                
-                {% endif %}
-
-                {% if adduser_index is defined %}
-                    {% if adduser_index[0] == index0 and adduser_index[1] == loop.index0 %}
-                    <form action="{{ url_for('check_task') }}" method="post">
-                        <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
-                        <input type="hidden" name="done" value="not done">
-                        <input type="hidden" name="id" value="{{ todo.id }}">
-    
+                        <input type="submit" value="Add user" class="hover:underline text-xs ">
                     </form>
     
-                    <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %}>
-                        {{ todo['task'] }}                
-                    </text>
-    
-                    <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
-                        <input type="submit" value="Edit">
-                    </form>
-    
-                    <form action="{{ url_for('delete_task') }}" method="post">
-                        <input type="submit" value="Delete">
-                        <input type="hidden" name="id" value="{{ todo.id }}">
-                    </form>
-    
-                    assignee:
-                    {% for user in todo.users|sort(attribute="name") %}
-                    {{ user.name }}
-                    {% endfor %}
-                    
-                    <!-- add user inputs -->
-                    <form action="{{ url_for('save_user') }}" method="post">
-                        <input type="text" name="name" id="" required>
-                        <input type="submit" value="v">
-                        <input type="hidden" name="id" value="{{ todo.id }}">
-                        
-                    </form>
-                    <a href="{{ url_for('index') }}">x</a>
-
-                    {% else %}
-                    <!-- disabled elements -->
-                    <li style="display: flex" disabled>
-                        <form action="{{ url_for('check_task') }}" method="post">
-                            <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
-                            <input type="hidden" name="done" value="not done">
-                        
-                        </form>
-
-                        <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %}>
-                            {{ todo['task'] }}                
-                        </text>
-
-                        <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
-                            <input type="submit" value="Edit">
-                        </form>
-        
-                        <form action="{{ url_for('delete_task') }}" method="post">
-                            <input type="submit" value="Delete">
-                            <input type="hidden" name="id" value="{{ todo.id }}">
-                        </form>
-                        assignee:
-                        {% for user in todo.users|sort(attribute="name") %}
-                        {{ user.name }}
-                        {% endfor %}
-        
-                        <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
-                            <input type="submit" value="Add user">
-                        </form>
-
-                    </li>
-
-                    {% endif %}
-                {% endif %} 
                 </li>
-
-            {% endfor %}
-
-        {% else %}
-
-            {% for todo in taskgroup.tasks|sort(attribute="task") %}
-            <li style="display: flex">
-                <form action="{{ url_for('check_task') }}" method="post">
-                    <input type="checkbox" name="check" onchange="this.form.submit()" {% if todo['done'] %} checked {% endif %}>
-                    <input type="hidden" name="done" value="not done">
-                    <input type="hidden" name="id" value="{{ todo.id }}">
-                    
-                </form>
-
-                <text {% if todo['done'] %} style="text-decoration: line-through" {% endif %}>
-                    {{ todo['task'] }}                
-                </text>
-
-                <text></text>
-                <form action="{{ url_for('edit_task', index0=index0, index=loop.index0) }}" method="get">
-                    <input type="submit" value="Edit">                    
-                </form>
-
-                <form action="{{ url_for('delete_task') }}" method="post">
-                    <input type="submit" value="Delete">
-                    <input type="hidden" name="id" value="{{ todo.id }}">
-                </form>
-                assignee:
-                {% for user in todo.users|sort(attribute="name") %}
-                {{ user.name }}
+                
                 {% endfor %}
-
-                <form action="{{ url_for('add_user', index0=index0, index=loop.index0) }}" method="get">
-                    <input type="submit" value="Add user">
-                </form>
-
-            </li>
+            {% endif %}
             
-            {% endfor %}
-        {% endif %}
-        
-    </ul>
-    {% endfor %}
+        </ul>
+        {% endfor %}
+    
+        <h3 class="text-2xl ">Users</h3>
+    
+        <ul>
+           {% for user in users %} 
+            <li class="flex text-sm space-x-2 ">
+                <text>
+                    • {{ user.name }}
+                </text>
+            
+                 <form action="{{ url_for('delete_user') }}" method="post">
+                    <input type="submit" value="Delete" class="hover:underline" >
+                    <input type="hidden" name="id" value="{{ user.id }}">
+                 </form>
+            </li>
+           {% endfor %}
+        </ul>
 
-    <h3>Users</h3>
-    <ul>
-       {% for user in users %} 
-        <li style="display: flex">
-            {{ user.name }}
-        
-             <form action="{{ url_for('delete_user') }}" method="post">
-                <input type="submit" value="Delete">
-                <input type="hidden" name="id" value="{{ user.id }}">
-             </form>
-        </li>
-       {% endfor %}
-    </ul>
+    </div>
+    
+    <!-- footer -->
+    <div class="h-[6rem] border border-slate-200 shadow-lg drop-shadow-lg flex items-center justify-center mt-[4rem]">Made by boboboy</div>
 
+    <script>
+        
+        const inputs = document.querySelectorAll("textarea");
+        if (inputs.length != 3) {
+            console.log('textArea error')
+        }
+
+        const output = document.querySelector("p");
+        let maxLength = 20;
+        const inc = 20;
+
+        const clearButtons = document.querySelectorAll(".clear-button")
+        if (clearButtons.length != 3) {
+            console.log('clearButton error')
+        }
+
+        clearButtons[0].style.visibility = "hidden"
+        clearButtons[1].style.visibility = "hidden"
+        clearButtons[2].style.visibility = "hidden"
+
+        const updateRow = (input) => {
+            const cols = 20
+            const minusValue = 8
+            const nRow = Math.floor(input.value.length/cols)+1
+            if (input.value.length > nRow*cols-minusValue) {
+                nRow += 1
+            }
+            return nRow 
+        }
+
+
+        inputs[0].addEventListener("input", (event) => {
+            // update clearButton visibility
+            if (inputs[0].value === "") {
+                clearButtons[0].style.visibility = "hidden"
+            } else {
+                clearButtons[0].style.visibility = "visible"
+            }
+
+            inputs[0].rows = updateRow(inputs[0])
+        })
+
+        inputs[1].addEventListener("input", (event) => {
+            // update clearButton visibility
+            if (inputs[1].value === "") {
+                clearButtons[1].style.visibility = "hidden"
+            } else {
+                clearButtons[1].style.visibility = "visible"
+            }
+            
+            inputs[1].rows = updateRow(inputs[1])
+        })
+        
+        inputs[2].addEventListener("input", (event) => {
+            // update clearButton visibility
+            if (inputs[2].value === "") {
+                clearButtons[2].style.visibility = "hidden"
+            } else {
+                clearButtons[2].style.visibility = "visible"
+            }
+
+            inputs[2].rows = updateRow(inputs[2])
+        })
+        
+        clearButtons[0].addEventListener("click", (event) => {
+            inputs[0].value = ""
+            inputs[0].rows = updateRow(inputs[0])
+            clearButtons[0].style.visibility = "hidden"
+        })
+ 
+        clearButtons[1].addEventListener("click", (event) => {
+            inputs[1].value = ""
+            inputs[1].rows = updateRow(inputs[1])
+            clearButtons[1].style.visibility = "hidden"
+        })
+
+        clearButtons[2].addEventListener("click", (event) => {
+            inputs[2].value = ""
+            inputs[2].rows = updateRow(inputs[2])
+            clearButtons[2].style.visibility = "hidden"
+        })
+    </script>
 </body>
 </html>
