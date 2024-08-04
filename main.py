@@ -123,43 +123,6 @@ def delete_user():
     db.session.delete(db.session.get(User, request.form['id']))
     db.session.commit()
     return redirect(url_for('index'))
-
-# APIs
-@app.route('/api/createtask', methods=['POST'])
-def createtask():
-    if request.method == 'POST':
-        task = Task(
-            text=request.json['task']
-        )
-        db.session.add(task)
-        db.session.commit()
-        return {'code': 200}
-
-@app.route('/api/createuser', methods=['POST'])
-def createuser():
-    if request.method == 'POST':
-        user = User(
-            name=request.json['name']
-        )
-        db.session.add(user)
-        db.session.commit()
-        return {'code': 200}
-    
-@app.route('/api/link-user-task', methods=['POST'])
-def link_user_task():
-    if request.method == 'POST':
-        """
-        get user
-        get task
-        link user and task
-        commit
-
-        how to get user and get task
-
-        """
-        pass
-        return {'code': 200}
-    pass
     
 if __name__ == '__main__':
     app.run(debug=True)
