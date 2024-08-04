@@ -1,4 +1,5 @@
 # Simpler
 Create, read, update, and delete tasks on the same page.
 ## Preview
-![image](https://github.com/naufalmahing/flask-todo-list/assets/71597476/6dac5465-115b-4c5c-8505-431b8fe32609)
+![image](https://github.com/user-attachments/assets/cda25487-f2c2-46f0-b1bc-fce787f00276)
+
